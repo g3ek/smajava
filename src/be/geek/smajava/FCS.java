@@ -1,7 +1,11 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package be.geek.smajava;
 
 /**
- * Frame Check Sequence
+ *
  * @author geek
  */
 public class FCS {
@@ -73,21 +77,18 @@ public class FCS {
         (short) 0x3de3, (short) 0x2c6a, (short) 0x1ef1, (short) 0x0f78
     };    
     
-    /**
-     * Calculate FCS checksum
-     * @param data
-     * @param cc
-     * @return 
-     */
     public static Short calcFcs(byte[] data, int cc) {
         short current = (short) 0xffff;
 
         int i = 19;
         while (cc > 0) {
             current = (short) (((current >>> 8) & 0xff) ^ fcstab[(current ^ data[i]) & 0xff]);
+            //System.out.printf(" %02x", data[i]);
             i++;
             cc--;
         }
+//        System.out.println();
+//        System.out.printf("current: %04x", current);
         current ^= 0xffff;
         return current;
     }    

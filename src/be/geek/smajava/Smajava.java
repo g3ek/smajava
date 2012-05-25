@@ -50,6 +50,22 @@ public class Smajava {
             }
         }
         
+        if (args.length > 2) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                Date fromDate = dateFormat.parse(args[1]);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(fromDate);
+                cal.set(Calendar.HOUR, 23);
+                fromDate = cal.getTime();
+                Log.debug(Smajava.class, "to date: "+fromDate);
+                Configuration.getEnvironment().setTotime(fromDate.getTime() / 1000);
+            } catch (ParseException ex) {
+                Log.error(Smajava.class, "Could not parse todate arg: "+args[1], ex);
+                System.exit(-1);
+            }            
+        }
+        
         Configuration.setDataFilename("/sma.in.new");
         Inverter inverter = new Inverter("3000TLHF", inverterAddress);
         inverter.setPassword("0000");

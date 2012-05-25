@@ -166,7 +166,7 @@ public class Codec {
                         }
                         break;
                     case TIMETO1: // encode end time
-                        long totime=Configuration.getEnvironment().getReportTime();
+                        long totime=Configuration.getEnvironment().getTotime();
                         //sprintf(tt,"%03x",(int)totime); //convert to a hex in a string
                         tt = Long.toHexString(totime).toCharArray();
                         ti = new char[2];
@@ -252,9 +252,11 @@ public class Codec {
                                 timestr = Arrays.copyOfRange(received, 63, 63+24);
                                 Log.debugBytes(this, "timestr: ", timestr);
                             }
+                            Calendar calendar = Calendar.getInstance();
+                            Configuration.getEnvironment().setTimedata(Util.convertLongToData(calendar.getTimeInMillis()/1000, new byte[24], 0));
                             // TODO comment this
                             //System.exit(-1);
-                            throw new SmajavaException("Could not extract timestring", SmajavaException.Type.BLUETOOTH_RESET);
+                            //throw new SmajavaException("Could not extract timestring", SmajavaException.Type.BLUETOOTH_RESET);
                         }
                         break;
                     case POW:
@@ -320,11 +322,16 @@ public class Codec {
                                     if (archdatalen == 0) {
                                         ptotal = gtotal;
                                     }
-                                    Log.info(this, "current: "+(gtotal-ptotal)*12);
-                                    Log.info(this, "\ntotal=%.3f Kwh current=%.0f Watts i=%d ", gtotal/1000, (float)((gtotal-ptotal)*((float)12)), cntr);
+                                    //Log.info(this, "current: "+(gtotal-ptotal)*12);
+                                    Calendar cal = Calendar.getInstance();
+                                    cal.setTimeInMillis(idate*1000);                                     
                                     if (idate != prev_idate+300) {
                                         System.out.println("Date error!");
-                                        System.exit(-1);
+                                        idate = 0;                                       
+                                        Log.error(this, "Wrong time: "+cal.getTime());
+                                        break;
+                                    } else {
+                                        Log.info(this, "%s total=%.3f Kwh current=%.0f Watts togo=%d i=%d ",cal.getTime().toString(), gtotal/1000, (float)((gtotal-ptotal)*((float)12)), togo, cntr);
                                     }
                                     if (archdatalen == 0) {
 
@@ -337,7 +344,7 @@ public class Codec {
                             if (togo == 0) {
                                 finished = true;
                             } else {
-                                received = Configuration.getInverter().receive();
+                                received = Configuration.getInverter().receive().getResult();
                             }
 
                         }
@@ -358,7 +365,7 @@ public class Codec {
      * @return
      * @throws IOException 
      */
-    private byte[] readStream(byte[] received) throws IOException {        
+    private byte[] readStream(byte[] received) throws IOException, SmajavaException {        
         byte[] result = new byte[500];
         int cntr=0;
         boolean finished = false;
@@ -374,9 +381,10 @@ public class Codec {
                 cntr++;
             }
             if (!terminated) {
-                received = Configuration.getInverter().receive();
+                ByteResult br = Configuration.getInverter().receive();
+                received = br.getResult();
                 //received = readBluetooth(inStream);
-                terminated = received[received.length -1] == 0x7e;
+                terminated = br.isTerminated();
                 i=18;
             } else {
                 finished = true;

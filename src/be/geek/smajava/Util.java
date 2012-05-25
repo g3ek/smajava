@@ -212,4 +212,16 @@ public class Util {
         }
         return result;
     }    
+    
+    public static byte[] convertLongToData(long value, byte[] data, int cc) {
+        char[] tt = Long.toHexString(value).toCharArray();
+        char[] ti = new char[2];
+        for (int cntr=7;cntr>0;cntr=cntr-2){ //change order and convert to integer
+                ti[1] = tt[cntr];
+                ti[0] = tt[cntr-1];	
+                data[cc] = Util.encodeHexString(String.valueOf(ti));		
+                cc++;
+        }        
+        return data;
+    }    
 }

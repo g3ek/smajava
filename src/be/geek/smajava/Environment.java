@@ -21,10 +21,13 @@ public class Environment {
      */
     private long fromtime;
     
+    private long totime;
+    
     public Environment() {
         reporttime = System.currentTimeMillis() / 1000;
         // set default from time to 5 minutes in the past
         fromtime = reporttime - 300;
+        totime = reporttime;
     }
     
     public long getReportTime() {
@@ -46,4 +49,14 @@ public class Environment {
     public void setFromtime(long fromtime) {
         this.fromtime = fromtime;
     }
+
+    public long getTotime() {
+        return totime;
+    }
+
+    public void setTotime(long totime) {
+        this.totime = totime;
+    }
+    
+    
 }
