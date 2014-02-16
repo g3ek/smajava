@@ -13,6 +13,8 @@ Copy all the smajava java files to your project and indicate the src dir as a so
 
 It should compile without errors.
 
+On linux systems you have to install some dev library:
+sudo apt-get install libbluetooth-dev
 
 Usage:
 
